@@ -4,14 +4,20 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 type neuron struct {
-	input  []chan float64
-	output []chan float64
-	weight []float64
-	bias   float64
-	id     int
+	input   []chan float64
+	output  []chan float64
+	weight  []float64
+	bias    float64
+	id      int
+	isInput bool
 }
 
 type inpMes struct {
@@ -35,17 +41,23 @@ func sigmoid(sum float64) float64 {
 }
 
 func (n *neuron) activate() {
-	lenInp := len(n.input)
+	//fmt.Println("neuron", n.id, "activated")
 	lenOut := len(n.output)
+	lenIn := len(n.input)
 	c := n.mergeInputChannels()
 	for {
 		totalInpVal := float64(0)
-		for i := 0; i < lenInp; i++ {
+		for i := 0; i < lenIn; i++ {
+			if n.id == 7 {
+				_ = "breakpoint"
+			}
 			res := <-c
-			totalInpVal += res.val*n.weight[res.id] + n.bias
+			totalInpVal += res.val * n.weight[res.id]
+			//fmt.Println("neur", n.id, "received", res, "weight", n.weight[res.id])
 		}
 		for i := 0; i < lenOut; i++ {
-			n.output[i] <- sigmoid(totalInpVal)
+			//fmt.Println("sending from ", n.id, "val", totalInpVal)
+			n.output[i] <- sigmoid(totalInpVal) //+ n.bias
 		}
 	}
 }
@@ -61,14 +73,27 @@ func (n *neuron) String() string {
 	return str
 }
 
-func newNeuron(input []chan float64, output []chan float64) *neuron {
+var numNeur = 0
+
+func newNeuron(input []chan float64, output []chan float64, isInput bool) *neuron {
 	n := &neuron{
-		input:  input,
-		output: output,
-		weight: make([]float64, len(input), len(input)),
+		input:   input,
+		output:  output,
+		weight:  make([]float64, len(input), len(input)),
+		id:      numNeur,
+		isInput: isInput,
+		bias:    -0.5,
 	}
-	for k, _ := range n.weight {
-		n.weight[k] = rand.NormFloat64()
+	numNeur++
+	if n.isInput == true {
+		for k, _ := range n.weight {
+			n.weight[k] = 1.0
+		}
+	} else {
+		for k, _ := range n.weight {
+			n.weight[k] = rand.NormFloat64() * 10
+		}
 	}
+	//fmt.Println(n.weight)
 	return n
 }
