@@ -1,11 +1,14 @@
+/*
+	Package nn creates neural networks and gives you the tools to modify their internal weights.
+*/
 package nn
 
 import (
 	"fmt"
 )
 
-//Net holds the neural network. It spawns a goroutine for every neuron and
-//Can be used with its methods.
+//Net holds the neural network. It must be created using its constructor. It spawns a goroutine for every neuron and
+//can be used with its methods.
 type Net struct {
 	layers        []*layer
 	inputChan     []chan float64
@@ -46,10 +49,12 @@ func (n *Net) String() string {
 	return str
 }
 
+//getInputChans is used internally in the constructer
 func (n *Net) getInputChans() []chan float64 {
 	return n.layers[0].inputChans
 }
 
+//activate calls layer.activate on all layers in all in Net
 func (n *Net) activate() {
 	for _, layer := range n.layers {
 		layer.activate()

@@ -94,6 +94,5 @@ func newNeuron(input []chan float64, output []chan float64, isInput bool) *neuro
 			n.weight[k] = rand.NormFloat64() * 10
 		}
 	}
-	//fmt.Println(n.weight)
 	return n
 }
