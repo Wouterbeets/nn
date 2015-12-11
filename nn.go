@@ -4,84 +4,92 @@ import (
 	"fmt"
 )
 
-const (
-	SIZE = 20
-)
-
+//Net holds the neural network. It spawns a goroutine for every neuron and
+//Can be used with its methods.
 type Net struct {
-	Layers        []*layer
-	InputChan     []chan float64
-	OutputChan    []chan float64
+	layers        []*layer
+	inputChan     []chan float64
+	outputChan    []chan float64
 	inputNeurons  int
 	hiddenNeurons int
 	totalLayers   int
 	outputNeurons int
 }
 
+//NewNet takes its size the nets layers as parametes, the minimum valaue for totalLayers is 3
+// one for in , one for hidden, one for out.
 func NewNet(inputNeurons, hiddenNeurons, totalLayers, outputNeurons int) *Net {
 	n := &Net{
-		Layers:        make([]*layer, totalLayers),
+		layers:        make([]*layer, totalLayers),
 		inputNeurons:  inputNeurons,
 		hiddenNeurons: hiddenNeurons,
 		totalLayers:   totalLayers,
 		outputNeurons: outputNeurons,
 	}
-	n.Layers[0] = newLayer(nil, inputNeurons, hiddenNeurons)
+	n.layers[0] = newLayer(nil, inputNeurons, hiddenNeurons)
 	for i := 1; i < totalLayers-2; i++ {
-		//fmt.Println("hidden neurons:")
-		n.Layers[i] = newLayer(n.Layers[i-1], hiddenNeurons, hiddenNeurons)
+		n.layers[i] = newLayer(n.layers[i-1], hiddenNeurons, hiddenNeurons)
 	}
-	n.Layers[totalLayers-2] = newLayer(n.Layers[totalLayers-3], hiddenNeurons, outputNeurons)
-	//fmt.Println("output neurons:")
-	n.Layers[totalLayers-1] = newLayer(n.Layers[totalLayers-2], outputNeurons, 1)
-	n.InputChan = n.getInputChans()
+	n.layers[totalLayers-2] = newLayer(n.layers[totalLayers-3], hiddenNeurons, outputNeurons)
+	n.layers[totalLayers-1] = newLayer(n.layers[totalLayers-2], outputNeurons, 1)
+	n.inputChan = n.getInputChans()
+	n.activate()
 	return n
 }
 
+//String makes Net implement the stringer interface
 func (n *Net) String() string {
 	str := ""
-	for lNum, layer := range n.Layers {
+	for lNum, layer := range n.layers {
 		str += fmt.Sprintln("layer", lNum, "holds\n", layer)
 	}
 	return str
 }
 
 func (n *Net) getInputChans() []chan float64 {
-	return n.Layers[0].inputChans
+	return n.layers[0].inputChans
 }
 
-func (n *Net) Activate() {
-	for _, layer := range n.Layers {
+func (n *Net) activate() {
+	for _, layer := range n.layers {
 		layer.activate()
 	}
 }
 
-func (n *Net) In(inp []float64) {
-	if len(inp) == len(n.Layers[0].neurons) {
+//Sends the input for the brain into its input channels
+// the result can be obtained by calling n.Out()
+func (n *Net) In(inp []float64) error {
+	if len(inp) == len(n.layers[0].neurons) {
 		for k, v := range inp {
-			n.InputChan[k] <- v
+			n.inputChan[k] <- v
 		}
+		return nil
+	} else {
+		return fmt.Errorf("input must be same size as net.InputNeurons")
 	}
 }
 
-func (n *Net) Out() []float64 {
-	ret := make([]float64, len(n.Layers[len(n.Layers)-1].neurons))
-	for k, v := range n.Layers[len(n.Layers)-1].neurons {
-		ret[k] = <-v.output[0]
+//Net.Out returns the value from the output neurons
+func (n *Net) Out() (outputValues []float64) {
+	outputValues = make([]float64, len(n.layers[len(n.layers)-1].neurons))
+	for k, v := range n.layers[len(n.layers)-1].neurons {
+		outputValues[k] = <-v.output[0]
 	}
-	return ret
+	return outputValues
 }
 
+//Net.GetWeights returns  a copy of all the values correspoding to each input hannel of neach neuron
+// these values contain all logic of the brain.
+//these value can be used to construct copies of a neural network.
 func (n *Net) GetWeights() (ret []float64) {
 	size := 0
-	for i, layer := range n.Layers {
+	for i, layer := range n.layers {
 		if i != 0 {
 			size += layer.connections
 		}
 	}
 	ret = make([]float64, 0, size)
-	_ = "breakpoint"
-	for i, layer := range n.Layers {
+	for i, layer := range n.layers {
 		if i != 0 {
 			ret = append(ret, layer.getWeights()...)
 		}
@@ -89,9 +97,12 @@ func (n *Net) GetWeights() (ret []float64) {
 	return
 }
 
+//Set Weight allows you to set the values corresponding to each input channel of each neuron
+//after the operation weight[0] will be equal to the value of the wieght of the first channel of the first neuron in the first hidden layer
+//wieght[1] will be equal the value of the weight of the second channel of said neuron. etc.
 func (n *Net) SetWeights(weights []float64) {
 	start, end := 0, 0
-	for i, layer := range n.Layers {
+	for i, layer := range n.layers {
 		if i != 0 {
 			end = start + layer.connections
 			layer.setWeigths(weights[start:end])

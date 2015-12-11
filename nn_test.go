@@ -51,7 +51,7 @@ func TestNewNet(test *testing.T) {
 	for _, t := range tests {
 		//just testing building the network for now, and that it doesnt halt.
 		n := NewNet(t.inputNeurons, t.hiddenNeurons, t.totalLayers, t.outputNeurons)
-		n.Activate()
+		n.activate()
 		n.In(t.in)
 		out := n.Out()
 		_ = out
