@@ -77,7 +77,7 @@ func TestNewNet(test *testing.T) {
 }
 
 func BenchmarkSetWeights(b *testing.B) {
-	n := NewNet(4, 6, 4, 1)
+	n := NewNet(4, 60, 100, 1)
 	for i := 0; i < b.N; i++ {
 		w := n.GetWeights()
 		n.SetWeights(w)
