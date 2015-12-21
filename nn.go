@@ -119,6 +119,7 @@ func (n *Net) GetWeights() []float64 {
 //after the operation weights[0] will be equal to the value of the weight aplied on the first channel of the first neuron in the first hidden layer
 //wieght[1] will be equal the value of the weight of the second channel of said neuron. etc.
 func (n *Net) SetWeights(weights []float64) {
+	n.weights = weights
 	start, end := 0, 0
 	for i, layer := range n.layers {
 		if i != 0 {
