@@ -10,7 +10,7 @@ type layer struct {
 	connections int
 }
 
-func newLayer(prevL *layer, numNeurons, numNextL int) *layer {
+func newLayer(prevL *layer, numNeurons, numNextL int, weights []float64, wCount *int) *layer {
 	l := &layer{
 		neurons:    make([]*neuron, numNeurons),
 		inputChans: make([]chan float64, numNeurons),
@@ -26,16 +26,19 @@ func newLayer(prevL *layer, numNeurons, numNextL int) *layer {
 				inp[k] = prevLNeur.output[i]
 			}
 			//fmt.Println("creating hidden neuron", numNeur)
-			l.neurons[i] = newNeuron(inp, out, false)
+			subWeights := weights[*wCount+l.connections : *wCount+l.connections+len(inp)]
+			l.neurons[i] = newNeuron(inp, out, false, subWeights)
 			l.connections += len(l.neurons[i].weight)
 		} else {
 			inp := make([]chan float64, 1)
 			inp[0] = make(chan float64)
+			subWeights := make([]float64, 1)
 			l.inputChans[i] = inp[0]
 			//fmt.Println("creating input neuron", numNeur)
-			l.neurons[i] = newNeuron(inp, out, true)
+			l.neurons[i] = newNeuron(inp, out, true, subWeights)
 		}
 	}
+	*wCount += l.connections
 	return l
 }
 
@@ -53,9 +56,7 @@ func (l *layer) activate() {
 	}
 }
 
-func (l *layer) getWeights() []float64 {
-	w := make([]float64, 0, l.connections)
-
+func (l *layer) getWeights() (w []float64) {
 	for _, neur := range l.neurons {
 		w = append(w, neur.weight...)
 	}

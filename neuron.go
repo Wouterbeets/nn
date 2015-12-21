@@ -48,15 +48,12 @@ func (n *neuron) activate() {
 	for {
 		totalInpVal := float64(0)
 		for i := 0; i < lenIn; i++ {
-			if n.id == 7 {
-				_ = "breakpoint"
-			}
 			res := <-c
 			totalInpVal += res.val * n.weight[res.id]
 			//fmt.Println("neur", n.id, "received", res, "weight", n.weight[res.id])
 		}
 		for i := 0; i < lenOut; i++ {
-			//fmt.Println("sending from ", n.id, "val", totalInpVal)
+			//fmt.Println("sending from ", n.id, "val", sigmoid(totalInpVal))
 			n.output[i] <- sigmoid(totalInpVal) //+ n.bias
 		}
 	}
@@ -75,11 +72,11 @@ func (n *neuron) String() string {
 
 var numNeur = 0
 
-func newNeuron(input []chan float64, output []chan float64, isInput bool) *neuron {
+func newNeuron(input []chan float64, output []chan float64, isInput bool, weights []float64) *neuron {
 	n := &neuron{
 		input:   input,
 		output:  output,
-		weight:  make([]float64, len(input), len(input)),
+		weight:  weights,
 		id:      numNeur,
 		isInput: isInput,
 		bias:    -0.5,
@@ -88,10 +85,6 @@ func newNeuron(input []chan float64, output []chan float64, isInput bool) *neuro
 	if n.isInput == true {
 		for k, _ := range n.weight {
 			n.weight[k] = 1.0
-		}
-	} else {
-		for k, _ := range n.weight {
-			n.weight[k] = rand.NormFloat64() * 10
 		}
 	}
 	return n
