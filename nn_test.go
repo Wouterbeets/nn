@@ -1,7 +1,7 @@
 package nn
 
 import (
-	"fmt"
+	//"fmt"
 	"testing"
 )
 
@@ -66,18 +66,18 @@ func TestNewNet(test *testing.T) {
 	for _, t := range tests {
 		n := NewNet(t.inputNeurons, t.hiddenNeurons, t.totalLayers, t.outputNeurons)
 		w := n.GetWeights()
-		fmt.Println("\nweights are", n.GetWeights())
+		//fmt.Println("\nweights are", n.GetWeights())
 		for i, _ := range w {
 			w[i] = float64(i)
 		}
-		fmt.Println("\nweights are", n.GetWeights())
+		//fmt.Println("\nweights are", n.GetWeights())
 		n.In(t.in)
 		_ = n.Out()
 	}
 }
 
 func BenchmarkSetWeights(b *testing.B) {
-	n := NewNet(4, 60, 100, 1)
+	n := NewNet(4, 60, 10, 1)
 	for i := 0; i < b.N; i++ {
 		w := n.GetWeights()
 		n.SetWeights(w)
