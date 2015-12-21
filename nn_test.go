@@ -13,54 +13,73 @@ func TestNewNet(test *testing.T) {
 		outputNeurons int
 		in            []float64
 	}{
+
 		{
-			inputNeurons:  2, //3 * 2 + (4-2) * 3 * 3
+			inputNeurons:  2,
 			hiddenNeurons: 3,
 			totalLayers:   4,
 			outputNeurons: 1,
 			in:            []float64{0.99, 0.1111},
 		},
-		//		{
-		//			inputNeurons:  19 * 19,
-		//			hiddenNeurons: 30,
-		//			totalLayers:   2,
-		//			outputNeurons: 1,
-		//			in: []float64{
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		//			},
-		//		},
-	}
-	for _, t := range tests {
-		//just testing building the network for now, and that it doesnt halt.
-		n := NewNet(t.inputNeurons, t.hiddenNeurons, t.totalLayers, t.outputNeurons)
-		n.activate()
-		n.In(t.in)
-		out := n.Out()
-		_ = out
-		n.In(t.in)
-		out = n.Out()
-		_ = out
-		w := n.GetWeights()
-		n.SetWeights(make([]float64, len(w), len(w)))
-		fmt.Println("\nweights are", n.GetWeights())
+
+		{
+			inputNeurons:  3,
+			hiddenNeurons: 4,
+			totalLayers:   5,
+			outputNeurons: 2,
+			in:            []float64{0.99, 0.1111, 0.15},
+		},
+
+		{
+			inputNeurons:  4,
+			hiddenNeurons: 15,
+			totalLayers:   16,
+			outputNeurons: 3,
+			in:            []float64{0.99, 0.1111, 0.15, 12.2},
+		},
+
+		{
+			inputNeurons:  4,
+			hiddenNeurons: 23,
+			totalLayers:   26,
+			outputNeurons: 3,
+			in:            []float64{0.99, 0.1111, 0.15, 12.2},
+		},
+
+		{
+			inputNeurons:  4,
+			hiddenNeurons: 1,
+			totalLayers:   3,
+			outputNeurons: 3,
+			in:            []float64{0.99, 0.1111, 0.15, 12.2},
+		},
+
+		{
+			inputNeurons:  4,
+			hiddenNeurons: 3,
+			totalLayers:   3,
+			outputNeurons: 3,
+			in:            []float64{0.99, 0.1111, 0.15, 12.2},
+		},
 	}
 
+	for _, t := range tests {
+		n := NewNet(t.inputNeurons, t.hiddenNeurons, t.totalLayers, t.outputNeurons)
+		w := n.GetWeights()
+		fmt.Println("\nweights are", n.GetWeights())
+		for i, _ := range w {
+			w[i] = float64(i)
+		}
+		fmt.Println("\nweights are", n.GetWeights())
+		n.In(t.in)
+		_ = n.Out()
+	}
+}
+
+func BenchmarkSetWeights(b *testing.B) {
+	n := NewNet(4, 60, 100, 1)
+	for i := 0; i < b.N; i++ {
+		w := n.GetWeights()
+		n.SetWeights(w)
+	}
 }
