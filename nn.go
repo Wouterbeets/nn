@@ -1,6 +1,4 @@
-/*
-	Package nn creates neural networks and gives you the tools to modify their internal weights.
-*/
+/*Package nn creates neural networks and gives you the tools to modify their internal weights.*/
 package nn
 
 import (
@@ -17,7 +15,6 @@ import (
 
 //Net holds the neural network. It must be created using its constructor. It spawns a goroutine for every neuron and
 //can be used with its methods.
-
 type Net struct {
 	layers        []*layer
 	inputChan     []chan float64
@@ -60,7 +57,7 @@ func (n *Net) makeWeights() {
 	hidToOutWeights := n.hiddenNeurons * n.outputNeurons
 	nw := hiddenWeights + hidToOutWeights + weightsInpToHidden
 	n.weights = make([]float64, nw, nw)
-	for i, _ := range n.weights {
+	for i := range n.weights {
 		n.weights[i] = rand.NormFloat64()
 	}
 }
@@ -86,7 +83,7 @@ func (n *Net) activate() {
 	}
 }
 
-//Sends the input for the brain into its input channels
+//In sends the input for the brain into its input channels
 // the result can be obtained by calling n.Out()
 func (n *Net) In(inp []float64) error {
 	if len(inp) == len(n.layers[0].neurons) {
@@ -94,12 +91,11 @@ func (n *Net) In(inp []float64) error {
 			n.inputChan[k] <- v
 		}
 		return nil
-	} else {
-		return fmt.Errorf("input must be same size as net.InputNeurons")
 	}
+	return fmt.Errorf("input must be same size as net.InputNeurons")
 }
 
-//Net.Out returns the value from the output neurons
+//Out returns the value from the output neurons
 func (n *Net) Out() (outputValues []float64) {
 	outputValues = make([]float64, len(n.layers[len(n.layers)-1].neurons))
 	for k, v := range n.layers[len(n.layers)-1].neurons {
@@ -108,14 +104,14 @@ func (n *Net) Out() (outputValues []float64) {
 	return outputValues
 }
 
-//Net.GetWeights returns the correspoding weights of each input channel of each neuron
+//GetWeights returns the correspoding weights of each input channel of each neuron
 //changes made to this slice will be reflected in the net
 //these value can be used to construct copies of a neural network.
 func (n *Net) GetWeights() []float64 {
 	return n.weights
 }
 
-//Set Weight allows you to set the values corresponding to each input channel of each neuron
+//SetWeights allows you to set the values corresponding to each input channel of each neuron
 //after the operation weights[0] will be equal to the value of the weight aplied on the first channel of the first neuron in the first hidden layer
 //wieght[1] will be equal the value of the weight of the second channel of said neuron. etc.
 func (n *Net) SetWeights(weights []float64) {
