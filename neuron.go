@@ -83,7 +83,7 @@ func newNeuron(input []chan float64, output []chan float64, isInput bool, weight
 	}
 	numNeur++
 	if n.isInput == true {
-		for k, _ := range n.weight {
+		for k := range n.weight {
 			n.weight[k] = 1.0
 		}
 	}
