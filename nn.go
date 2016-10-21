@@ -4,6 +4,7 @@ package nn
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 /*
@@ -124,4 +125,8 @@ func (n *Net) SetWeights(weights []float64) {
 			start = end
 		}
 	}
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }
